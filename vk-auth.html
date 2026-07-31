@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ключ ВК получен</title>
+<style>
+  body {
+    margin: 0; padding: 40px 20px;
+    background: #faf6ee; color: #1c2119;
+    font: 17px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { color: #1e673f; font-size: 27px; margin: 0 0 8px; }
+  p.sub { color: #5d6b5f; margin: 0 0 28px; }
+  .box {
+    background: #fff; border: 1px solid #e2ddd0;
+    border-radius: 12px; padding: 20px 22px; margin-bottom: 16px;
+  }
+  .label { font-size: 14px; color: #5d6b5f; margin-bottom: 8px; }
+  .val {
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 15px; word-break: break-all;
+    background: #f2efe6; border-radius: 7px; padding: 12px 14px;
+  }
+  button {
+    background: #1e673f; color: #fff; border: 0;
+    border-radius: 9px; padding: 13px 22px;
+    font-size: 16px; cursor: pointer; margin-top: 14px;
+  }
+  button:hover { background: #175232; }
+  .err { background: #fff4f2; border-left: 4px solid #c0392b; }
+  .ok { color: #1e673f; font-weight: 600; margin-top: 12px; min-height: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ключ ВК получен</h1>
+  <p class="sub">Нажми кнопку и пришли скопированное в чат. Это временный код,
+  он живёт несколько минут - им нельзя ничего опубликовать, только обменять на ключ.</p>
+
+  <div id="out"></div>
+
+  <script>
+    var q = new URLSearchParams(location.search);
+    var code = q.get("code");
+    var device = q.get("device_id");
+    var err = q.get("error_description") || q.get("error");
+    var out = document.getElementById("out");
+
+    if (err) {
+      out.innerHTML = '<div class="box err"><div class="label">ВК вернул ошибку</div>' +
+                      '<div class="val"></div></div>';
+      out.querySelector(".val").textContent = err;
+    } else if (code) {
+      out.innerHTML =
+        '<div class="box"><div class="label">Код</div><div class="val" id="c"></div></div>' +
+        '<div class="box"><div class="label">Устройство</div><div class="val" id="d"></div></div>' +
+        '<button id="btn">Скопировать оба значения</button>' +
+        '<div class="ok" id="ok"></div>';
+      document.getElementById("c").textContent = code;
+      document.getElementById("d").textContent = device || "(не пришло)";
+      document.getElementById("btn").onclick = function () {
+        var text = "code=" + code + "\ndevice_id=" + (device || "");
+        navigator.clipboard.writeText(text).then(function () {
+          document.getElementById("ok").textContent = "Скопировано. Вставь в чат.";
+        }, function () {
+          document.getElementById("ok").textContent =
+            "Не вышло скопировать - выдели значения выше вручную.";
+        });
+      };
+    } else {
+      out.innerHTML = '<div class="box err"><div class="label">Пусто</div>' +
+        '<div class="val">В адресе нет кода. Открой ссылку авторизации заново.</div></div>';
+    }
+  </script>
+</div>
+</body>
+</html>
